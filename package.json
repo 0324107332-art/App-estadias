@@ -1,13 +1,15 @@
 {
   "name": "app-estadias-utt",
   "version": "1.0.0",
-  "scripts": {
-    "build": "echo 'Skipping web build'",
-    "capacitor:sync": "cap sync"
-  },
+  "description": "App Mapa Tijuana Heriberto",
   "dependencies": {
-    "@capacitor/android": "^8.3.0",
-    "@capacitor/cli": "^8.3.0",
-    "@capacitor/core": "^8.3.0"
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/core": "^6.0.0"
+  },
+  "scripts": {
+    "build": "echo 'Build not required for simple assets'",
+    "ionic:build": "echo 'Build not required'",
+    "capacitor:sync": "cap sync"
   }
 }
