@@ -1,10 +1,9 @@
 {
   "name": "app-estadias-utt",
   "version": "1.0.0",
-  "description": "App de estadías Heriberto",
-  "main": "index.html",
   "scripts": {
-    "build": "echo 'No web build needed'"
+    "build": "echo 'Skipping web build'",
+    "capacitor:sync": "cap sync"
   },
   "dependencies": {
     "@capacitor/android": "^8.3.0",
