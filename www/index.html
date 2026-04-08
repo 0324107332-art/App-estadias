@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Empresas UTT</title>
+    
+    <link rel="manifest" href="manifest.json">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #121212;
+            color: white;
+        }
+
+        header {
+            background: #0d47a1;
+            padding: 15px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        #controls {
+            padding: 10px;
+            background: #1e1e1e;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: none;
+            box-sizing: border-box;
+        }
+
+        #map {
+            height: 45vh;
+            width: 100%;
+        }
+
+        #lista {
+            height: 45vh;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .empresa {
+            background: #1e1e1e;
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 5px solid #0d47a1;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 10px;
+            width: 100%;
+            border: none;
+            border-radius: 5px;
+            background: #0d47a1;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>📍 Empresas Estadías UTT</header>
+
+<div id="controls">
+    <input type="text" id="buscador" placeholder="Buscar empresa...">
+
+    <select id="carrera">
+        <option value="Todas">Todas las carreras</option>
+        <option>Mantenimiento Industrial</option>
+        <option>Mecatrónica</option>
+        <option>Procesos Industriales</option>
+        <option>TIC</option>
+        <option>Logística</option>
+        <option>Administración</option>
+    </select>
+</div>
+
+<div id="map"></div>
+<div id="lista"></div>
+
+<script>
+const empresas = [
+    { nombre:"Samsung Mexicana", lat:32.5358, lng:-116.9214, carreras:["Mecatrónica","TIC","Mantenimiento Industrial"] },
+    { nombre:"DJ Orthopedics (DJO)", lat:32.4632, lng:-116.8225, carreras:["Procesos Industriales","Logística"] },
+    { nombre:"Toyota BC", lat:32.4334, lng:-116.7156, carreras:["Mantenimiento Industrial","Logística"] },
+    { nombre:"Medtronic", lat:32.4650, lng:-116.8310, carreras:["Procesos Industriales"] },
+    { nombre:"Foxconn (PCE Tech)", lat:32.5401, lng:-116.9382, carreras:["TIC","Mecatrónica","Logística"] },
+    { nombre:"Poly (Plantronics)", lat:32.5444, lng:-116.9185, carreras:["Administración","TIC"] },
+    { nombre:"Skyworks Solutions", lat:32.5380, lng:-116.9150, carreras:["Mecatrónica","Procesos Industriales"] },
+    { nombre:"Thermo Fisher", lat:32.5185, lng:-116.9042, carreras:["Energías Renovables"] },
+    { nombre:"Zodiac Aerospace", lat:32.4820, lng:-116.8650, carreras:["Mecatrónica"] },
+    { nombre:"CareFusion", lat:32.4645, lng:-116.8240, carreras:["Procesos Industriales","Mecatrónica"] },
+    { nombre:"Schneider Electric", lat:32.4680, lng:-116.8210, carreras:["Mantenimiento Industrial","Mecatrónica"] },
+    { nombre:"Eaton", lat:32.5395, lng:-116.9120, carreras:["Mecatrónica","Mantenimiento Industrial"] },
+    { nombre:"Honeywell", lat:32.5410, lng:-116.9250, carreras:["Procesos Industriales","TIC"] },
+    { nombre:"Bose", lat:32.4510, lng:-116.8450, carreras:["Mecatrónica","Logística"] },
+    { nombre:"Greatbatch Medical", lat:32.4665, lng:-116.8290, carreras:["Procesos Industriales"] },
+    { nombre:"Essilor México", lat:32.4620, lng:-116.8180, carreras:["Procesos Industriales","Mantenimiento Industrial"] },
+    { nombre:"GNP Seguros", lat:32.5255, lng:-117.0180, carreras:["Administración"] },
+    { nombre:"Calimax", lat:32.5150, lng:-116.9550, carreras:["Logística","Administración"] },
+    { nombre:"Baja California Center", lat:32.3550, lng:-117.0620, carreras:["Administración"] },
+    { nombre:"Marriott Hotel", lat:32.5120, lng:-117.0080, carreras:["Administración"] },
+    { nombre:"Hyatt Place", lat:32.5135, lng:-117.0050, carreras:["Administración"] },
+    { nombre:"Ayuntamiento Tijuana", lat:32.5298, lng:-117.0220, carreras:["Administración","TIC"] },
+    { nombre:"CECUT", lat:32.5305, lng:-117.0232, carreras:["Administración"] },
+    { nombre:"INDEX Zona Costa", lat:32.5140, lng:-117.0090, carreras:["Logística"] },
+    { nombre:"CANACINTRA", lat:32.5155, lng:-117.0110, carreras:["Administración"] },
+    { nombre:"SMK Electrónica", lat:32.4675, lng:-116.8235, carreras:["Mecatrónica","Mantenimiento Industrial"] },
+    { nombre:"Ametek", lat:32.5375, lng:-116.9135, carreras:["Mecatrónica","Procesos Industriales"] },
+    { nombre:"Becton Dickinson", lat:32.4710, lng:-116.8350, carreras:["Procesos Industriales"] },
+    { nombre:"Integon", lat:32.5240, lng:-117.0160, carreras:["Administración"] },
+    { nombre:"Turbotec", lat:32.4785, lng:-116.8520, carreras:["Mantenimiento Industrial","Mecatrónica"] },
+    { nombre:"Kyocera", lat:32.5450, lng:-116.9220, carreras:["Procesos Industriales","Mecatrónica"] },
+    { nombre:"Carlisle", lat:32.5390, lng:-116.9205, carreras:["Procesos Industriales"] },
+    { nombre:"Safran", lat:32.4815, lng:-116.8640, carreras:["Mecatrónica"] },
+    { nombre:"Gulfstream", lat:32.4695, lng:-116.8275, carreras:["Mecatrónica"] },
+    { nombre:"Femsa", lat:32.4920, lng:-116.9150, carreras:["Logística","Mantenimiento Industrial"] },
+    { nombre:"Heineken", lat:32.4950, lng:-116.9220, carreras:["Mantenimiento Industrial","Logística"] },
+    { nombre:"Grupo Bimbo", lat:32.4550, lng:-116.8400, carreras:["Mantenimiento Industrial","Logística"] },
+    { nombre:"SAT Aduana", lat:32.5460, lng:-116.9320, carreras:["Logística"] },
+    { nombre:"HSBC", lat:32.5110, lng:-116.9850, carreras:["Administración"] },
+    { nombre:"Amazon", lat:32.5480, lng:-116.9550, carreras:["Logística","TIC"] },
+    { nombre:"Mercado Libre", lat:32.4615, lng:-116.8155, carreras:["Logística","TIC"] },
+    { nombre:"Inovotools", lat:32.4655, lng:-116.8260, carreras:["Mecatrónica","Procesos Industriales"] },
+    { nombre:"Gasmart", lat:32.5050, lng:-116.9950, carreras:["Administración"] },
+    { nombre:"Hospital General", lat:32.5335, lng:-117.0150, carreras:["Energías Renovables"] },
+    { nombre:"CESPT", lat:32.5080, lng:-116.9750, carreras:["Energías Renovables","Mantenimiento Industrial"] },
+    { nombre:"Embotelladora", lat:32.4980, lng:-116.9550, carreras:["Mantenimiento Industrial","Logística"] },
+    { nombre:"Sanyo", lat:32.4635, lng:-116.8205, carreras:["Mecatrónica","Procesos Industriales"] },
+    { nombre:"Hotel Quartz", lat:32.5315, lng:-117.0210, carreras:["Administración"] }
+];
+
+let map, markers = [], directionsService, directionsRenderer;
+
+function initMap() {
+    map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 11,
+        center: { lat: 32.52, lng: -117.03 }
+    });
+
+    directionsService = new google.maps.DirectionsService();
+    directionsRenderer = new google.maps.DirectionsRenderer();
+    directionsRenderer.setMap(map);
+
+    actualizarVista(empresas);
+}
+
+function actualizarVista(lista) {
+    mostrarEmpresas(lista);
+    mostrarLista(lista);
+}
+
+function mostrarEmpresas(lista) {
+    markers.forEach(m => m.setMap(null));
+    markers = [];
+
+    lista.forEach(e => {
+        const marker = new google.maps.Marker({
+            position: { lat: e.lat, lng: e.lng },
+            map: map
+        });
+
+        const info = new google.maps.InfoWindow({
+            content: `<b>${e.nombre}</b><br>
+            <button onclick="mostrarRuta(${e.lat}, ${e.lng})">Ver ruta</button>`
+        });
+
+        marker.addListener("click", () => info.open(map, marker));
+        markers.push(marker);
+    });
+}
+
+function mostrarLista(lista) {
+    const contenedor = document.getElementById("lista");
+    contenedor.innerHTML = "";
+
+    lista.forEach(e => {
+        contenedor.innerHTML += `
+            <div class="empresa">
+                <b>${e.nombre}</b><br>
+                <small>${e.carreras.join(", ")}</small><br>
+                <button onclick="mostrarRuta(${e.lat}, ${e.lng})">📍 Ver ruta</button>
+            </div>
+        `;
+    });
+}
+
+function mostrarRuta(lat, lng) {
+    navigator.geolocation.getCurrentPosition(pos => {
+        directionsService.route({
+            origin: {
+                lat: pos.coords.latitude,
+                lng: pos.coords.longitude
+            },
+            destination: { lat, lng },
+            travelMode: "DRIVING"
+        }, (result, status) => {
+            if (status === "OK") {
+                directionsRenderer.setDirections(result);
+            }
+        });
+    });
+}
+
+function filtrar() {
+    const texto = document.getElementById("buscador").value.toLowerCase();
+    const carrera = document.getElementById("carrera").value;
+
+    let resultado = empresas.filter(e =>
+        e.nombre.toLowerCase().includes(texto)
+    );
+
+    if (carrera !== "Todas") {
+        resultado = resultado.filter(e =>
+            e.carreras.includes(carrera)
+        );
+    }
+
+    actualizarVista(resultado);
+}
+
+document.getElementById("buscador").addEventListener("input", filtrar);
+document.getElementById("carrera").addEventListener("change", filtrar);
+</script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCsjScZmxFpcDc-EtBlTrUVC_iZ_xivI_U&callback=initMap" async defer></script>
+
+</body>
+</html>

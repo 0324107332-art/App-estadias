@@ -1,0 +1,6 @@
+{
+"name": "App Estadias",
+"short_name": "UTT",
+"start_url": "index.html",
+"display": "standalone"
+}
